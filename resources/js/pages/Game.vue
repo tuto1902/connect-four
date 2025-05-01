@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import GameLayout from '@/layouts/GameLayout.vue';
-import { computed, onMounted, ref } from 'vue';
-import { StreamerbotClient } from '@streamerbot/client';
-
-let client = null;
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { router } from '@inertiajs/vue3';
+import { useStreamerbot } from '@streamerbot/vue';
 
 const gameOver = ref(false);
 const turn = ref('player1');
@@ -13,17 +12,18 @@ const userName = ref('');
 const COLUMNS = 7;
 const ROWS = 6;
 
-onMounted(() => {
-    client = new StreamerbotClient({
-        host: '192.168.100.14'
-    });
-    client.on('Command.Triggered', (data) => {
-        console.log(data.data);
-        if (data.data.command == '!g' || data.data.command == '!game') {
-            userName.value = data.data.user.display;
-        }
-    })
+const { client, status, data, connect, disconnect } = useStreamerbot({
+    subscribe: { Command: ['Triggered'] },
+    host: '192.168.100.14'
 });
+
+onMounted(() => {
+    connect()
+});
+
+onUnmounted(() => {
+    disconnect();
+})
 
 const board = computed(() => {
     let board: number[][] = []
