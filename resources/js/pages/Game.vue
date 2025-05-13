@@ -17,6 +17,20 @@ const { client, status, data, connect, disconnect } = useStreamerbot({
     host: '192.168.100.14'
 });
 
+const props = defineProps<{ user:string }>();
+
+watch(data, (event) => {
+    if (event.hasOwnProperty('data')) {
+        if (event.data.command == '!play' && event.data.user.display == props.user && turn.value == 'player2') {
+            const match = event.data.message.match(/^[1-7]$/);
+            if (match) {
+                const column = parseInt(match[0]);
+                takeTurn(column-1);
+            }
+        }
+    }
+});
+
 onMounted(() => {
     connect()
 });
@@ -137,10 +151,10 @@ function takeTurn(column:number) {
                 {{ userName }} requested a new game
             </h1>
             <h1 class="font-extrabold text-4xl" v-show="!gameOver">
-                Player <span v-if="turn == 'player1'">1</span><span v-else>2</span>
+                <span v-if="turn == 'player1'">Player 1</span><span v-else>{{ user }}</span>
             </h1>
             <h1 class="font-extrabold text-4xl" v-show="gameOver">
-                Player <span v-if="turn == 'player1'">1</span><span v-else>2</span> Wins!
+                <span v-if="turn == 'player1'">Player 1</span><span v-else>{{ user }}</span> Wins!
             </h1>
             <div class="flex justify-center pt-6">
                 <div class="relative bg-blue-600 rounded-lg">
@@ -165,7 +179,9 @@ function takeTurn(column:number) {
                             transition-colors
                             duration-100
                             ease-in-out
-                        "></div>
+                        ">
+                            <div class="absolute -top-8 left-[21px]">{{ columnIndex + 1 }}</div>
+                        </div>
                         <div v-for="(row, rowIndex) in board" :key="rowIndex" class="flex">
                             <svg
                                 v-for="(column, columnIndex) in row"
