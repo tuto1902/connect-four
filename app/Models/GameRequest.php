@@ -12,8 +12,6 @@ class GameRequest extends Model
         'user'
     ];
 
-    protected $dates = ['played_at'];
-
     protected function casts(): array
     {
         return [

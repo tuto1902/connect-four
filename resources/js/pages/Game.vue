@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import GameLayout from '@/layouts/GameLayout.vue';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { router, useForm, InertiaFormProps } from '@inertiajs/vue3';
+import { router, useForm } from '@inertiajs/vue3';
 import { useStreamerbot } from '@streamerbot/vue';
 import { Button } from '@/components/ui/button';
 
@@ -13,9 +13,6 @@ const userName = ref('');
 const COLUMNS = 7;
 const ROWS = 6;
 
-interface FormData {
-    is_winner: boolean
-}
 const form = useForm({
     is_winner: false
 });

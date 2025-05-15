@@ -12,10 +12,6 @@ class GameController extends Controller
 {
     public function index(Request $request, GameRequest $game)
     {
-        if ($game->played_at !== null and $game->is_winner !== null) {
-            // return to_route('games.list');
-        }
-
         $game->played_at = Carbon::now();
         $game->save();
         return Inertia::render('Game', [ 'user' => $game->user, 'game_request_id' => $game->id ]);
