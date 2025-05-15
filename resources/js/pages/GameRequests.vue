@@ -26,6 +26,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface GameRequest {
   id: number;
   user: string;
+  is_winner: boolean;
+  played_at: string;
   created_at: string;
   updated_at: string;
 }
@@ -36,6 +38,20 @@ const { client, status, data, connect, disconnect } = useStreamerbot({
 });
 
 const userName = ref('');
+
+function hasResults(isWinner: any): boolean {
+    return isWinner !== null && isWinner !== undefined;
+}
+
+function gameResult(isWinner: any): string {
+    if (isWinner === 1) {
+        return 'Won';
+    } else if (isWinner === 0) {
+        return 'Lost';
+    }
+
+    return '';
+}
 
 defineProps<{ gameRequests: GameRequest[] }>();
 
@@ -57,8 +73,8 @@ onUnmounted(() => {
 })
 
 
-function play(user:string) {
-    router.get('/', { user: user });
+function play(game_request_id:number) {
+    router.get(`/play/${game_request_id}`);
 }
 </script>
 
@@ -73,6 +89,7 @@ function play(user:string) {
                     <TableRow>
                         <TableHead>User Name</TableHead>
                         <TableHead>Requested At</TableHead>
+                        <TableHead>Result</TableHead>
                         <TableHead>Actions</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -80,8 +97,9 @@ function play(user:string) {
                     <TableRow v-for="gameRequest in gameRequests" :key="gameRequest.id">
                         <TableCell>{{ gameRequest.user }}</TableCell>
                         <TableCell>{{ gameRequest.created_at }}</TableCell>
+                        <TableCell>{{ gameResult(gameRequest.is_winner) }}</TableCell>
                         <TableCell>
-                            <Button @click="play(gameRequest.user)">
+                            <Button v-if="!hasResults(gameRequest.is_winner)" @click="play(gameRequest.id)">
                                 <Play class="size-4 mr-2" /> Play
                             </Button>
                         </TableCell>

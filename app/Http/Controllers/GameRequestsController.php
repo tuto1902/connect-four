@@ -11,7 +11,7 @@ class GameRequestsController extends Controller
 {
     public function index()
     {
-        $gameRequests = GameRequest::all();
+        $gameRequests = GameRequest::orderBy('is_winner')->orderBy('created_at')->get();
 
         return Inertia::render('GameRequests', [
             'gameRequests' => $gameRequests

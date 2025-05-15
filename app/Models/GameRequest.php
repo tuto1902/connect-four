@@ -15,7 +15,8 @@ class GameRequest extends Model
     protected function casts(): array
     {
         return [
-            'created_at' => 'datetime:Y-m-d h:i A'
+            'created_at' => 'datetime:Y-m-d h:i A',
+            'played_at' => 'datetime:Y-m-d h:i A'
         ];
     }
 

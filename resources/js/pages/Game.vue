@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import GameLayout from '@/layouts/GameLayout.vue';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { router, useForm } from '@inertiajs/vue3';
 import { useStreamerbot } from '@streamerbot/vue';
+import { Button } from '@/components/ui/button';
 
 const gameOver = ref(false);
 const turn = ref('player1');
@@ -12,12 +13,16 @@ const userName = ref('');
 const COLUMNS = 7;
 const ROWS = 6;
 
+const form = useForm({
+    is_winner: false
+});
+
 const { client, status, data, connect, disconnect } = useStreamerbot({
     subscribe: { Command: ['Triggered'] },
     host: '192.168.100.14'
 });
 
-const props = defineProps<{ user:string }>();
+const props = defineProps<{ user:string, game_request_id:number }>();
 
 watch(data, (event) => {
     if (event.hasOwnProperty('data')) {
@@ -52,6 +57,9 @@ const board = computed(() => {
     return board;
 })
 
+function goBack() {
+    router.get('/games');
+}
 
 function isColumnFull(column:number) {
     return board.value[0][column] != 0;
@@ -130,6 +138,10 @@ function takeTurn(column:number) {
         return;
     }
 
+    if (turn.value !== 'player1' && props.user !== 'Tuto1902' ) {
+        return;
+    }
+
     let row = findEmptyRowInColumn(column);
     let color = turn.value == 'player1' ? 1 : 2;
 
@@ -137,6 +149,9 @@ function takeTurn(column:number) {
 
     if (isWinningMove(color)) {
         gameOver.value = true;
+        // @ts-ignore
+        form.is_winner = turn.value == 'player2';
+        form.put(`/play/${props.game_request_id}`);
     } else {
         turn.value = turn.value == 'player1' ? 'player2' : 'player1';
     }
@@ -156,6 +171,7 @@ function takeTurn(column:number) {
             <h1 class="font-extrabold text-4xl" v-show="gameOver">
                 <span v-if="turn == 'player1'">Player 1</span><span v-else>{{ user }}</span> Wins!
             </h1>
+            <Button v-if="gameOver" @click="goBack">Go Back</Button>
             <div class="flex justify-center pt-6">
                 <div class="relative bg-blue-600 rounded-lg">
                     <div

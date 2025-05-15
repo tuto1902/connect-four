@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('game_requests', function (Blueprint $table) {
             $table->id();
             $table->string('user');
+            $table->boolean('is_winner')->nullable();
+            $table->timestamp('played_at')->nullable();
             $table->timestamps();
         });
     }
